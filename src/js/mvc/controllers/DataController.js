@@ -11,6 +11,8 @@ class DataController {
         this.model = null;
         this.view = null;
         this.cacheManager = null;
+        this.lastExtractedData = null;
+        this.lastExtractionInfo = null;
     }
 
     /**
@@ -31,7 +33,8 @@ class DataController {
         // Configurar callbacks de la vista
         this.view.setCallbacks({
             onExtract: () => this.handleExtract(),
-            onClearCache: () => this.handleClearCache()
+            onClearCache: () => this.handleClearCache(),
+            onDownload: () => this.handleDownload()
         });
 
         // Mostrar estadísticas iniciales de caché
@@ -91,8 +94,19 @@ class DataController {
                 // Actualizar estadísticas de caché
                 await this.updateCacheStats();
 
-                // Generar y descargar CSV
+                // Almacenar datos de la extracción exitosa
                 if (result.data.length > 0) {
+                    this.lastExtractedData = result.data;
+                    this.lastExtractionInfo = {
+                        totalRecords: result.stats.totalRecords,
+                        startDate: startDate,
+                        endDate: endDate,
+                        extractionDate: new Date().toISOString()
+                    };
+
+                    // Mostrar panel de descarga con los datos disponibles
+                    this.view.showDownloadPanel(this.lastExtractionInfo);
+
                     const csvContent = this.model.convertToCSV(result.data);
                     const filename = `precios_bolsa_${this.model.formatDate(new Date(startDate))}_${this.model.formatDate(new Date(endDate))}.csv`;
                     this.model.downloadCSV(csvContent, filename);
@@ -166,6 +180,27 @@ class DataController {
             this.view.updateCacheStats(stats);
         } catch (error) {
             console.error('Error al actualizar estadísticas de caché:', error);
+        }
+    }
+
+    /**
+     * Manejar evento de descarga manual de datos
+     */
+    handleDownload() {
+        if (!this.lastExtractedData || this.lastExtractedData.length === 0) {
+            this.view.showWarning("No hay datos disponibles para descargar. Realice una extracción primero.");
+            return;
+        }
+
+        try {
+            const csvContent = this.model.convertToCSV(this.lastExtractedData);
+            const filename = `precios_bolsa_${this.model.formatDate(new Date(this.lastExtractionInfo.startDate))}_${this.model.formatDate(new Date(this.lastExtractionInfo.endDate))}.csv`;
+            this.model.downloadCSV(csvContent, filename);
+
+            this.view.addLog(`📥 Archivo CSV descargado manualmente: ${filename}`, "success");
+        } catch (error) {
+            this.view.showError("Error al generar el archivo CSV");
+            this.view.addLog(`❌ Error en descarga manual: ${error.message}`, 'error');
         }
     }
 

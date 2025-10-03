@@ -4,87 +4,725 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extractor de Precios de Bolsa SIMEM</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="src/css/styles.css">
 </head>
-<body>
-    <div class="container">
-        <h1>⚡ Extractor de Precios de Bolsa</h1>
-        <p class="subtitle">SIMEM - Sistema de Intercambios del Mercado Eléctrico Mayorista</p>
-
-        <div class="info-section">
-            <h3>📊 Variables del Dataset</h3>
-            <div class="info-grid">
-                <div class="info-card">
-                    <strong>PB_Nal</strong>
-                    <p>Precio de bolsa nacional</p>
+<body class="bg-light">
+    <div class="container-fluid py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%); min-height: 100vh;">
+        <!-- Header Section -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-12 text-center">
+                <div class="hero-section">
+                    <div class="brand-logo mb-3">
+                        <i class="fas fa-bolt text-warning display-3"></i>
+                    </div>
+                    <h1 class="display-3 text-dark mb-3 font-weight-bold" style="text-shadow: 0 4px 8px rgba(255,255,255,0.8);">
+                        <i class="fas fa-bolt text-warning me-3"></i>
+                        Precio Bolsa Eléctrica
+                    </h1>
+                    <p class="lead text-muted mb-4" style="font-size: 1.3rem; font-weight: 300;">
+                        <i class="fas fa-magic me-2 text-primary"></i>
+                        La forma más <strong class="text-primary">simple y rápida</strong> de obtener datos del mercado eléctrico colombiano
+                    </p>
+                    <div class="hero-stats">
+                        <span class="badge badge-lg bg-gradient-primary px-4 py-2 me-2">
+                            <i class="fas fa-magic me-1"></i>Sin Instalación
+                        </span>
+                        <span class="badge badge-lg bg-gradient-success px-4 py-2 me-2">
+                            <i class="fas fa-gift me-1"></i>100% Gratis
+                        </span>
+                        <span class="badge badge-lg bg-gradient-info px-4 py-2">
+                            <i class="fas fa-clock me-1"></i>5 Minutos
+                        </span>
+                    </div>
                 </div>
-                <div class="info-card">
-                    <strong>PB_Int</strong>
-                    <p>Precio de bolsa internacional</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row justify-content-center">
+            <div class="col-xl-11 col-xxl-10">
+                <div class="main-dashboard">
+                    <div class="dashboard-header mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="text-dark mb-0">
+                                    <i class="fas fa-tachometer-alt me-3 text-primary"></i>
+                                    Panel de Control
+                                </h2>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <small class="text-muted">Última actualización: <span id="lastUpdate">Nunca</span></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content">
+
+                        <!-- Variables Information Section -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="info-panel">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-chart-line me-3 text-primary"></i>
+                                            Datos que puedes obtener fácilmente
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-primary-subtle text-primary">Información valiosa del mercado eléctrico</span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row g-3">
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="metric-card info-card">
+                                                    <div class="metric-icon">
+                                                        <i class="fas fa-flag text-info"></i>
+                                                    </div>
+                                                    <div class="metric-content">
+                                                        <h5 class="metric-title">PB_Nal</h5>
+                                                        <p class="metric-description">Precio de bolsa nacional</p>
+                                                        <div class="metric-badge">
+                                                            <span class="badge bg-info-subtle text-info">COP/kWh</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="metric-card success-card">
+                                                    <div class="metric-icon">
+                                                        <i class="fas fa-globe text-success"></i>
+                                                    </div>
+                                                    <div class="metric-content">
+                                                        <h5 class="metric-title">PB_Int</h5>
+                                                        <p class="metric-description">Precio de bolsa internacional</p>
+                                                        <div class="metric-badge">
+                                                            <span class="badge bg-success-subtle text-success">COP/kWh</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="metric-card warning-card">
+                                                    <div class="metric-icon">
+                                                        <i class="fas fa-map-marker-alt text-warning"></i>
+                                                    </div>
+                                                    <div class="metric-content">
+                                                        <h5 class="metric-title">PB_Tie</h5>
+                                                        <p class="metric-description">Precio de bolsa TIE (Ecuador)</p>
+                                                        <div class="metric-badge">
+                                                            <span class="badge bg-warning-subtle text-warning">COP/kWh</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Benefits Section -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="info-panel">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-star me-3 text-warning"></i>
+                                            ¿Por qué elegir esta herramienta?
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-warning-subtle text-warning">La opción inteligente</span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row g-4">
+                                            <div class="col-md-4">
+                                                <div class="benefit-card">
+                                                    <div class="benefit-icon">
+                                                        <i class="fas fa-mouse-pointer text-primary"></i>
+                                                    </div>
+                                                    <div class="benefit-content">
+                                                        <h5 class="benefit-title">Sin complicaciones</h5>
+                                                        <p class="benefit-description">Solo abre tu navegador. No necesitas instalar programas, crear cuentas o configurar servidores.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="benefit-card">
+                                                    <div class="benefit-icon">
+                                                        <i class="fas fa-gift text-success"></i>
+                                                    </div>
+                                                    <div class="benefit-content">
+                                                        <h5 class="benefit-title">Completamente gratis</h5>
+                                                        <p class="benefit-description">Herramienta de código abierto y libre. Úsala personal o comercialmente sin restricciones ni costos ocultos.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="benefit-card">
+                                                    <div class="benefit-icon">
+                                                        <i class="fas fa-clock text-info"></i>
+                                                    </div>
+                                                    <div class="benefit-content">
+                                                        <h5 class="benefit-title">Ahorra tiempo</h5>
+                                                        <p class="benefit-description">Obtén datos históricos del mercado eléctrico en minutos, no en horas. Automatización inteligente incluida.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <div class="data-source-info">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                                                        <strong>Datos provenientes de:</strong> API pública del Sistema de Información del Mercado Eléctrico Mayorista (SIMEM) - XM S.A. E.S.P.
+                                                        <span class="badge bg-info-subtle text-info ms-2">Fuente oficial confiable</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CSV Columns Information -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="info-panel">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-file-code me-3 text-secondary"></i>
+                                            Especificación del Dataset
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-secondary-subtle text-secondary">6 Columnas</span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-code text-primary"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">CodigoVariable</h6>
+                                                            <small class="text-muted">Identificador único</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Código de la variable monitoreada</p>
+                                                        <div class="spec-values">
+                                                            <span class="badge bg-outline-primary">PB_Nal</span>
+                                                            <span class="badge bg-outline-primary">PB_Int</span>
+                                                            <span class="badge bg-outline-primary">PB_Tie</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-clock text-info"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">FechaHora</h6>
+                                                            <small class="text-muted">Marca temporal</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Fecha y hora exacta del registro</p>
+                                                        <div class="spec-format">
+                                                            <code class="bg-light px-2 py-1 rounded">YYYY-MM-DD HH:mm:ss</code>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-dollar-sign text-success"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">Valor</h6>
+                                                            <small class="text-muted">Precio registrado</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Valor numérico de la variable</p>
+                                                        <div class="spec-unit">
+                                                            <span class="badge bg-success-subtle text-success">COP/kWh</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-ruler text-warning"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">UnidadMedida</h6>
+                                                            <small class="text-muted">Unidad estándar</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Unidad de medida normalizada</p>
+                                                        <div class="spec-unit">
+                                                            <code class="bg-light px-2 py-1 rounded">COP/kWh</code>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-tag text-danger"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">Versión</h6>
+                                                            <small class="text-muted">Código de liquidación</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Versión del proceso de liquidación</p>
+                                                        <div class="spec-values">
+                                                            <span class="badge bg-outline-danger">TX1</span>
+                                                            <span class="badge bg-outline-danger">TX2</span>
+                                                            <span class="badge bg-outline-danger">TX3</span>
+                                                            <span class="badge bg-outline-danger">TXR</span>
+                                                            <span class="badge bg-outline-danger">TXF</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="spec-card">
+                                                    <div class="spec-header">
+                                                        <div class="spec-icon">
+                                                            <i class="fas fa-hourglass text-secondary"></i>
+                                                        </div>
+                                                        <div class="spec-title">
+                                                            <h6 class="mb-0">CodigoDuracion</h6>
+                                                            <small class="text-muted">Período temporal</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="spec-content">
+                                                        <p class="mb-2">Duración del período de medición</p>
+                                                        <div class="spec-format">
+                                                            <code class="bg-light px-2 py-1 rounded">ISO8601</code>
+                                                            <span class="badge bg-secondary-subtle text-secondary ms-2">PT1H</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date Selection Form -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="control-panel">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-calendar-alt me-3 text-primary"></i>
+                                            Elige qué datos necesitas
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-primary-subtle text-primary">
+                                                <i class="fas fa-mouse-pointer me-1"></i>
+                                                Solo 3 clics para obtener datos
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row g-4">
+                                            <div class="col-lg-4">
+                                                <div class="form-floating">
+                                                    <input type="date" class="form-control form-control-lg"
+                                                           id="fechaInicial" value="2025-01-01"
+                                                           style="border: 2px solid rgba(13, 110, 253, 0.2);">
+                                                    <label for="fechaInicial" class="text-muted">
+                                                        <i class="fas fa-calendar-plus me-2"></i>
+                                                        Fecha Inicial
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="form-floating">
+                                                    <input type="date" class="form-control form-control-lg"
+                                                           id="fechaFinal" value="2025-01-31"
+                                                           style="border: 2px solid rgba(13, 110, 253, 0.2);">
+                                                    <label for="fechaFinal" class="text-muted">
+                                                        <i class="fas fa-calendar-minus me-2"></i>
+                                                        Fecha Final
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="d-grid">
+                                                    <button class="btn btn-primary btn-lg action-btn" id="extractBtn"
+                                                            style="height: 58px; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);">
+                                                        <div class="btn-content">
+                                                            <div class="btn-icon">
+                                                                <i class="fas fa-rocket"></i>
+                                                            </div>
+                                                            <div class="btn-text">
+                                                                <span class="btn-title">🚀 Obtener Datos</span>
+                                                                <small class="btn-subtitle">¡Es así de fácil!</small>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quick Date Presets -->
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <div class="date-presets">
+                                                    <small class="text-muted me-3">Accesos rápidos:</small>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-outline-primary btn-sm preset-btn"
+                                                                data-days="1">
+                                                            <i class="fas fa-clock me-1"></i>Hoy
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-primary btn-sm preset-btn"
+                                                                data-days="7">
+                                                            <i class="fas fa-calendar-week me-1"></i>7 días
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-primary btn-sm preset-btn"
+                                                                data-days="30">
+                                                            <i class="fas fa-calendar-alt me-1"></i>30 días
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cache Management -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="cache-panel">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-server me-3 text-info"></i>
+                                            Gestión de Caché
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-info-subtle text-info">
+                                                <i class="fas fa-memory me-1"></i>
+                                                Almacenamiento Local
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-8 mb-4 mb-lg-0">
+                                                <div class="cache-stats-display">
+                                                    <div class="stats-grid">
+                                                        <div class="stat-item">
+                                                            <div class="stat-icon">
+                                                                <i class="fas fa-calendar-check text-primary"></i>
+                                                            </div>
+                                                            <div class="stat-content">
+                                                                <div class="stat-value" id="cacheDates">-</div>
+                                                                <div class="stat-label">Fechas Almacenadas</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="stat-item">
+                                                            <div class="stat-icon">
+                                                                <i class="fas fa-database text-success"></i>
+                                                            </div>
+                                                            <div class="stat-content">
+                                                                <div class="stat-value" id="cacheRecords">-</div>
+                                                                <div class="stat-label">Registros Totales</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="stat-item">
+                                                            <div class="stat-icon">
+                                                                <i class="fas fa-weight-hanging text-warning"></i>
+                                                            </div>
+                                                            <div class="stat-content">
+                                                                <div class="stat-value" id="cacheSize">-</div>
+                                                                <div class="stat-label">Espacio Utilizado</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cache-meta">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            Los datos se almacenan localmente en su navegador para mejorar el rendimiento
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="cache-actions">
+                                                    <button class="btn btn-outline-danger w-100" onclick="window.cacheLocal.limpiarCache()">
+                                                        <div class="btn-content">
+                                                            <div class="btn-icon">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </div>
+                                                            <div class="btn-text">
+                                                                <span class="btn-title">Limpiar Caché</span>
+                                                                <small class="btn-subtitle">Eliminar todos los datos</small>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                    <div class="action-hint mt-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-exclamation-triangle me-1 text-warning"></i>
+                                                            Esta acción no se puede deshacer
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="progress-panel" id="progressContainer" style="display: none;">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-cogs me-3 text-primary"></i>
+                                            Proceso de Extracción
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-primary-subtle text-primary">
+                                                <i class="fas fa-play me-1"></i>
+                                                En Ejecución
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <!-- Progress Bar -->
+                                        <div class="progress-section mb-4">
+                                            <div class="progress-meta">
+                                                <div class="progress-info">
+                                                    <h6 class="mb-1">Progreso de Descarga</h6>
+                                                    <small class="text-muted">Procesando datos día por día</small>
+                                                </div>
+                                                <div class="progress-percentage" id="progressText">0%</div>
+                                            </div>
+                                            <div class="progress mb-3" style="height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                     id="progressBar" role="progressbar"
+                                                     style="width: 0%; background: linear-gradient(45deg, #0d6efd, #0056b3); border-radius: 10px;">
+                                                    <span class="progress-text">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status Message -->
+                                        <div class="status-section mb-4">
+                                            <div class="alert alert-info alert-enhanced" id="statusMessage">
+                                                <div class="alert-icon">
+                                                    <i class="fas fa-spinner fa-spin"></i>
+                                                </div>
+                                                <div class="alert-content">
+                                                    <h6 class="alert-title">Iniciando Extracción</h6>
+                                                    <p class="alert-message mb-0">Preparando el proceso de descarga de datos...</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Logs Section -->
+                                        <div class="logs-section">
+                                            <div class="logs-header">
+                                                <h6 class="logs-title">
+                                                    <i class="fas fa-terminal me-2"></i>
+                                                    Registro de Actividad
+                                                </h6>
+                                                <div class="logs-badge">
+                                                    <span class="badge bg-light text-dark" id="logCount">0 entradas</span>
+                                                </div>
+                                            </div>
+                                            <div class="logs-container">
+                                                <div class="log-scroll-area" id="logs">
+                                                    <div class="no-logs-message">
+                                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                        <p class="text-muted">Los mensajes de actividad aparecerán aquí</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Download Section -->
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <div class="download-panel" id="downloadContainer" style="display: none;">
+                                    <div class="panel-header">
+                                        <h3 class="panel-title">
+                                            <i class="fas fa-download me-3 text-success"></i>
+                                            Descargar Datos
+                                        </h3>
+                                        <div class="panel-badge">
+                                            <span class="badge bg-success-subtle text-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Datos Disponibles
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-8 mb-4 mb-lg-0">
+                                                <div class="download-info">
+                                                    <div class="download-stats">
+                                                        <div class="stat-item">
+                                                            <div class="stat-icon">
+                                                                <i class="fas fa-file-csv text-success"></i>
+                                                            </div>
+                                                            <div class="stat-content">
+                                                                <div class="stat-value" id="downloadRecords">-</div>
+                                                                <div class="stat-label">Registros Disponibles</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="stat-item">
+                                                            <div class="stat-icon">
+                                                                <i class="fas fa-calendar-range text-info"></i>
+                                                            </div>
+                                                            <div class="stat-content">
+                                                                <div class="stat-value" id="downloadDateRange">-</div>
+                                                                <div class="stat-label">Período de Datos</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="download-meta">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            Los datos están listos para descargar. El archivo se generará en formato CSV.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="download-actions">
+                                                    <button class="btn btn-success btn-lg w-100" id="downloadBtn">
+                                                        <div class="btn-content">
+                                                            <div class="btn-icon">
+                                                                <i class="fas fa-download"></i>
+                                                            </div>
+                                                            <div class="btn-text">
+                                                                <span class="btn-title">📥 Descargar CSV</span>
+                                                                <small class="btn-subtitle">Obtener archivo</small>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                    <div class="action-hint mt-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-mouse-pointer me-1"></i>
+                                                            Haz clic para descargar
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="footer-panel">
+                                    <div class="footer-content">
+                                        <div class="row align-items-center">
+                                            <div class="col-lg-6 mb-3 mb-lg-0">
+                                                <div class="footer-brand">
+                                                    <div class="brand-icon">
+                                                        <i class="fas fa-code text-primary"></i>
+                                                    </div>
+                                                    <div class="brand-info">
+                                                        <h6 class="brand-title">Desarrollado por</h6>
+                                                        <p class="brand-author mb-0">
+                                                            <strong class="text-dark">Aldemar Mejía</strong>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="footer-contact">
+                                                    <div class="contact-item">
+                                                        <div class="contact-icon">
+                                                            <i class="fas fa-envelope"></i>
+                                                        </div>
+                                                        <div class="contact-info">
+                                                            <small class="contact-label">Contacto</small>
+                                                            <a href="mailto:mejia414@hotmail.com" class="contact-link">
+                                                                mejia414@hotmail.com
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="footer-bottom">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-6 mb-2 mb-md-0">
+                                                <small class="footer-copyright">
+                                                    <i class="fas fa-heart me-1 text-danger"></i>
+                                                    2025 Herramienta Libre para el Mercado Eléctrico Colombiano
+                                                    <span class="badge bg-success-subtle text-success ms-2">Open Source</span>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6 text-md-end">
+                                                <small class="footer-version">
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    Versión 2.0.0
+                                                    <span class="badge bg-success-subtle text-success ms-2">Profesional</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
-                <div class="info-card">
-                    <strong>PB_Tie</strong>
-                    <p>Precio de bolsa TIE (Ecuador)</p>
-                </div>
             </div>
-
-            <h3>📋 Columnas del CSV</h3>
-            <ul class="columns-list">
-                <li><strong>CodigoVariable:</strong> Código de la variable (PB_Nal, PB_Int, PB_Tie)</li>
-                <li><strong>FechaHora:</strong> Fecha y hora de representación del dato</li>
-                <li><strong>Valor:</strong> Valor de la variable en COP/kWh</li>
-                <li><strong>UnidadMedida:</strong> Unidad de medida (COP/kWh)</li>
-                <li><strong>Version:</strong> Versión de la liquidación (TX1, TX2, TX3, TXR, TXF)</li>
-                <li><strong>CodigoDuracion:</strong> Código de duración en formato ISO8601 (PT1H = 1 hora)</li>
-            </ul>
-        </div>
-
-        <div class="form-group">
-            <label for="fechaInicial">Fecha Inicial:</label>
-            <input type="date" id="fechaInicial" value="2025-01-01">
-        </div>
-
-        <div class="form-group">
-            <label for="fechaFinal">Fecha Final:</label>
-            <input type="date" id="fechaFinal" value="2025-01-31">
-        </div>
-
-        <button class="btn" id="extractBtn">
-            🚀 Extraer Datos
-        </button>
-
-        <div class="cache-controls">
-            <div class="cache-stats" id="cacheStats">
-                <strong>📊 Estadísticas de Caché:</strong><br>
-                Cargando...
-            </div>
-            <button class="btn-secondary" onclick="window.cacheLocal.limpiarCache()">
-                🗑️ Limpiar Caché
-            </button>
-        </div>
-
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar-wrapper">
-                <div class="progress-bar" id="progressBar">0%</div>
-            </div>
-
-            <div class="status-message" id="statusMessage">
-                <p><span class="spinner"></span>Iniciando extracción...</p>
-            </div>
-
-            <div class="logs" id="logs"></div>
-        </div>
-
-        <div class="footer">
-            <p>🛠️ Creado por: <strong>Aldemar Mejía</strong></p>
-            <p>📧 Contacto: <a href="mailto:mejia414@hotmail.com">mejia414@hotmail.com</a></p>
         </div>
     </div>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Scripts de la arquitectura MVC -->
     <script src="src/js/core/cache.js"></script>
     <script src="src/js/mvc/models/DataModel.js"></script>
     <script src="src/js/mvc/views/DataView.js"></script>
     <script src="src/js/mvc/controllers/DataController.js"></script>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,21 +1,34 @@
-# Extractor de Precios de Bolsa SIMEM
+# ⚡ Precio Bolsa Eléctrica - Herramienta Libre y Gratuita
 
-![Extractor de Precios de Bolsa](https://img.shields.io/badge/Sector-Energía-blue)
-![Versión](https://img.shields.io/badge/Versión-1.0-green)
+![Precio Bolsa Eléctrica](https://img.shields.io/badge/Sector-Energía-blue)
+![Versión](https://img.shields.io/badge/Versión-2.0-green)
+![Licencia](https://img.shields.io/badge/Licencia-Libre-brightgreen)
+![Estado](https://img.shields.io/badge/Estado-Open%20Source-success)
 
-## 📋 Descripción
+## 🎯 ¿Por qué usar esta herramienta?
 
-Herramienta web para extraer datos de precios de bolsa del Sistema de Intercambios del Mercado Eléctrico Mayorista (SIMEM) de Colombia. Permite obtener información histórica de precios de energía en diferentes modalidades (nacional, internacional y TIE) para análisis y reportes del sector eléctrico.
+**La forma más simple y rápida de obtener datos del mercado eléctrico colombiano.** Sin instalaciones complicadas, registros o costos. Solo abre tu navegador y obtén los datos que necesitas en minutos.
 
-## ✨ Características
+Esta herramienta libre aprovecha la API pública de SIMEM para brindarte acceso inmediato a información histórica de precios de energía, perfecta para análisis, reportes y toma de decisiones en el sector eléctrico.
 
-- **Extracción de datos** por rango de fechas personalizable
-- **Descarga automática** en formato CSV
-- **Sistema de reintentos** para garantizar la obtención de datos
-- **Múltiples proxies CORS** para evitar restricciones de acceso
-- **Interfaz intuitiva** con información detallada sobre las variables
-- **Visualización en tiempo real** del progreso de extracción
-- **Registro de actividad** con mensajes informativos, advertencias y errores
+## ✨ Ventajas principales
+
+### 🚀 **Simplicidad extrema**
+- **Sin instalaciones** - Solo abre tu navegador web
+- **Sin registros** - No necesitas crear cuentas o proporcionar datos personales
+- **Sin costos** - Totalmente gratuito y de código abierto
+- **Interfaz intuitiva** - Diseñada para que cualquiera pueda usarla
+
+### ⚡ **Rapidez y eficiencia**
+- **Extracción inteligente** - Procesa datos día por día para máxima velocidad
+- **Caché automático** - Los datos se almacenan localmente para consultas futuras
+- **Progreso en tiempo real** - Ve exactamente cuánto falta para completar tu descarga
+- **Descarga automática** - El CSV se genera y descarga automáticamente
+
+### 🛡️ **Confiabilidad garantizada**
+- **Múltiples fuentes** - Usa diferentes servidores proxy para evitar bloqueos
+- **Reintentos automáticos** - Si falla una consulta, automáticamente intenta de nuevo
+- **Registro detallado** - Cada paso del proceso queda registrado para tu tranquilidad
 
 ## 📊 Variables disponibles
 
@@ -36,13 +49,21 @@ El archivo CSV descargado contiene las siguientes columnas:
 - **Version:** Versión de la liquidación (TX1, TX2, TX3, TXR, TXF)
 - **CodigoDuracion:** Código de duración en formato ISO8601 (PT1H = 1 hora)
 
-## 🚀 Cómo usar
+## 🚀 Cómo usar - ¡Es realmente fácil!
 
-1. Abre el archivo `index.html` en tu navegador web
-2. Selecciona la **Fecha Inicial** y **Fecha Final** para el rango de datos que deseas extraer
-3. Haz clic en el botón **Extraer Datos**
-4. Espera a que se complete el proceso de extracción
-5. El archivo CSV se descargará automáticamente con el nombre `precios_bolsa_FECHA-INICIAL_FECHA-FINAL.csv`
+### **3 pasos simples:**
+
+1. **🔓 Abre tu navegador** - Solo abre el archivo `index.html` (sin instalaciones)
+2. **📅 Elige fechas** - Selecciona el período que necesitas (desde una semana hasta varios meses)
+3. **⚡ Haz clic** - Presiona "Iniciar Extracción" y listo
+
+### **¿Qué pasa después?**
+- **⏱️ Proceso automático** - La herramienta hace todo el trabajo por ti
+- **📊 Progreso visible** - Ves exactamente cuánto falta en tiempo real
+- **💾 Descarga automática** - El CSV se descarga automáticamente cuando termina
+- **🔄 Datos listos para usar** - Abre el archivo en Excel, Python, o cualquier herramienta de análisis
+
+**¡Todo en menos de 5 minutos!** 🚀
 
 ### ✨ Características de la Nueva Arquitectura
 
@@ -96,10 +117,21 @@ src/js/mvc/
 
 - **Aldemar Mejía** - [mejia414@hotmail.com](mailto:mejia414@hotmail.com)
 
-## 📄 Licencia
+## 📄 Licencia - ¡Totalmente Libre!
 
-Este proyecto es de uso libre para fines educativos y profesionales.
+Esta herramienta es **100% libre y gratuita** para uso personal, educativo, profesional y comercial. Puedes:
+
+- ✅ **Usarla gratis** sin límites de tiempo o funcionalidades
+- ✅ **Compartir** con colegas y amigos
+- ✅ **Modificar** el código fuente para adaptarlo a tus necesidades
+- ✅ **Distribuir** versiones modificadas (mencionando el autor original)
+- ✅ **Usar en proyectos comerciales** sin restricciones
+
+### 🤝 Contribuir al proyecto
+¿Encontraste un bug o tienes una mejora? ¡Las contribuciones son bienvenidas! Esta herramienta es de la comunidad para la comunidad.
 
 ---
 
-*Nota: Esta herramienta no está afiliada oficialmente con SIMEM o XM S.A. E.S.P.*
+## ⚖️ Descargo de responsabilidad
+
+*Esta herramienta utiliza datos públicos de SIMEM pero no está afiliada oficialmente con SIMEM o XM S.A. E.S.P. El uso de los datos es responsabilidad exclusiva del usuario.*

@@ -16,10 +16,20 @@ class DataView {
             progressBar: document.getElementById('progressBar'),
             statusMessage: document.getElementById('statusMessage'),
             logs: document.getElementById('logs'),
-            cacheStats: document.getElementById('cacheStats')
+            cacheDates: document.getElementById('cacheDates'),
+            cacheRecords: document.getElementById('cacheRecords'),
+            cacheSize: document.getElementById('cacheSize'),
+            lastUpdate: document.getElementById('lastUpdate'),
+            logCount: document.getElementById('logCount'),
+            downloadContainer: document.getElementById('downloadContainer'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            downloadRecords: document.getElementById('downloadRecords'),
+            downloadDateRange: document.getElementById('downloadDateRange')
         };
 
         this.eventListeners = {};
+        this.logCount = 0;
+        this.lastUpdateTime = null;
     }
 
     /**
@@ -54,6 +64,62 @@ class DataView {
             };
             clearCacheBtn.addEventListener('click', this.eventListeners.clearCacheBtn);
         }
+
+        // Event listeners para botones de preset de fechas
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(button => {
+            this.eventListeners[`preset-${button.dataset.days}`] = () => {
+                this.setPresetDates(parseInt(button.dataset.days));
+            };
+            button.addEventListener('click', this.eventListeners[`preset-${button.dataset.days}`]);
+        });
+
+        // Event listener para el botón de descarga
+        if (this.elements.downloadBtn) {
+            this.eventListeners.downloadBtn = () => {
+                if (this.onDownload) {
+                    this.onDownload();
+                }
+            };
+            this.elements.downloadBtn.addEventListener('click', this.eventListeners.downloadBtn);
+        }
+    }
+
+    /**
+     * Establecer fechas preset
+     */
+    setPresetDates(days) {
+        const endDate = new Date();
+        const startDate = new Date();
+
+        if (days === 1) {
+            // Hoy
+            startDate.setHours(0, 0, 0, 0);
+        } else {
+            // Días anteriores
+            startDate.setDate(startDate.getDate() - (days - 1));
+            startDate.setHours(0, 0, 0, 0);
+        }
+
+        if (this.elements.fechaInicial) {
+            this.elements.fechaInicial.value = this.formatDate(startDate);
+        }
+        if (this.elements.fechaFinal) {
+            this.elements.fechaFinal.value = this.formatDate(endDate);
+        }
+
+        // Agregar log de preset aplicado
+        this.addLog(`📅 Fechas configuradas: ${days} día${days !== 1 ? 's' : ''}`, 'info');
+    }
+
+    /**
+     * Formatear fecha para input date
+     */
+    formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     /**
@@ -79,6 +145,7 @@ class DataView {
         if (this.elements.progressBar) {
             this.elements.progressBar.style.width = percentage + '%';
             this.elements.progressBar.textContent = percentage + '%';
+            this.elements.progressBar.setAttribute('aria-valuenow', percentage);
         }
 
         if (this.elements.progressContainer) {
@@ -114,27 +181,32 @@ class DataView {
     showStatus(message, type = 'info') {
         if (!this.elements.statusMessage) return;
 
-        this.elements.statusMessage.className = 'status-message';
+        // Limpiar clases anteriores
+        this.elements.statusMessage.className = 'alert';
 
         let icon = '';
+        let alertType = 'alert-info';
+
         switch (type) {
             case 'error':
-                icon = '❌';
-                this.elements.statusMessage.classList.add('error');
+                icon = '<i class="fas fa-times-circle me-2"></i>';
+                alertType = 'alert-danger';
                 break;
             case 'success':
-                icon = '✅';
-                this.elements.statusMessage.classList.add('success');
+                icon = '<i class="fas fa-check-circle me-2"></i>';
+                alertType = 'alert-success';
                 break;
             case 'warning':
-                icon = '⚠️';
-                this.elements.statusMessage.classList.add('warning');
+                icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+                alertType = 'alert-warning';
                 break;
             default:
-                icon = '<span class="spinner"></span>';
+                icon = '<i class="fas fa-spinner fa-spin me-2"></i>';
+                alertType = 'alert-info';
         }
 
-        this.elements.statusMessage.innerHTML = `<p>${icon} ${message}</p>`;
+        this.elements.statusMessage.classList.add(alertType);
+        this.elements.statusMessage.innerHTML = `${icon}${message}`;
     }
 
     /**
@@ -144,28 +216,58 @@ class DataView {
         if (!this.elements.logs) return;
 
         const p = document.createElement('p');
+        p.className = 'mb-1';
 
+        // Agregar icono según el tipo de mensaje
+        let icon = '';
         switch (type) {
             case 'success':
-                p.className = 'success-log';
+                icon = '<i class="fas fa-check-circle text-success me-2"></i>';
+                p.classList.add('success-log');
                 break;
             case 'error':
-                p.className = 'error-log';
+                icon = '<i class="fas fa-times-circle text-danger me-2"></i>';
+                p.classList.add('error-log');
                 break;
             case 'warning':
-                p.className = 'warning-log';
+                icon = '<i class="fas fa-exclamation-triangle text-warning me-2"></i>';
+                p.classList.add('warning-log');
                 break;
             case 'retry':
-                p.className = 'retry-log';
+                icon = '<i class="fas fa-redo text-primary me-2"></i>';
+                p.classList.add('retry-log');
                 break;
             case 'cache':
-                p.className = 'cache-log';
+                icon = '<i class="fas fa-database text-info me-2"></i>';
+                p.classList.add('cache-log');
                 break;
+            default:
+                icon = '<i class="fas fa-info-circle text-muted me-2"></i>';
         }
 
-        p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        p.innerHTML = `${icon}<small>[${new Date().toLocaleTimeString()}]</small> ${message}`;
+
+        // Remover mensaje de "no hay logs" si existe
+        const noLogsMsg = this.elements.logs.querySelector('.no-logs-message');
+        if (noLogsMsg) {
+            noLogsMsg.remove();
+        }
+
         this.elements.logs.appendChild(p);
         this.elements.logs.scrollTop = this.elements.logs.scrollHeight;
+
+        // Actualizar contador de logs
+        this.logCount++;
+        this.updateLogCount();
+    }
+
+    /**
+     * Actualizar contador de logs
+     */
+    updateLogCount() {
+        if (!this.elements.logCount) return;
+
+        this.elements.logCount.textContent = `${this.logCount} entrada${this.logCount !== 1 ? 's' : ''}`;
     }
 
     /**
@@ -173,7 +275,12 @@ class DataView {
      */
     clearLogs() {
         if (this.elements.logs) {
-            this.elements.logs.innerHTML = '';
+            this.elements.logs.innerHTML = `
+                <div class="no-logs-message">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Los mensajes de actividad aparecerán aquí</p>
+                </div>
+            `;
         }
     }
 
@@ -181,21 +288,49 @@ class DataView {
      * Actualizar estadísticas de caché
      */
     updateCacheStats(stats = null) {
-        if (!this.elements.cacheStats) return;
-
         if (stats) {
-            this.elements.cacheStats.innerHTML = `
-                <strong>📊 Estadísticas de Caché:</strong><br>
-                Fechas almacenadas: ${stats.totalFechas}<br>
-                Total registros: ${stats.totalRegistros.toLocaleString()}<br>
-                Tamaño: ${stats.tamanoMB} MB
-            `;
+            // Actualizar elementos individuales
+            if (this.elements.cacheDates) {
+                this.elements.cacheDates.textContent = stats.totalFechas.toLocaleString();
+            }
+            if (this.elements.cacheRecords) {
+                this.elements.cacheRecords.textContent = stats.totalRegistros.toLocaleString();
+            }
+            if (this.elements.cacheSize) {
+                this.elements.cacheSize.textContent = `${stats.tamanoMB} MB`;
+            }
+
+            // Actualizar timestamp de última actualización
+            this.updateLastUpdateTime();
         } else {
-            this.elements.cacheStats.innerHTML = `
-                <strong>📊 Estadísticas de Caché:</strong><br>
-                Cargando...
-            `;
+            // Estado de carga
+            if (this.elements.cacheDates) {
+                this.elements.cacheDates.textContent = '-';
+            }
+            if (this.elements.cacheRecords) {
+                this.elements.cacheRecords.textContent = '-';
+            }
+            if (this.elements.cacheSize) {
+                this.elements.cacheSize.textContent = '-';
+            }
         }
+    }
+
+    /**
+     * Actualizar timestamp de última actualización
+     */
+    updateLastUpdateTime() {
+        if (!this.elements.lastUpdate) return;
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+        this.elements.lastUpdate.textContent = timeString;
+        this.lastUpdateTime = now;
     }
 
     /**
@@ -251,6 +386,44 @@ class DataView {
     }
 
     /**
+     * Mostrar panel de descarga con datos disponibles
+     */
+    showDownloadPanel(downloadInfo) {
+        if (this.elements.downloadContainer) {
+            this.elements.downloadContainer.style.display = 'block';
+        }
+
+        // Actualizar información del panel de descarga
+        this.updateDownloadInfo(downloadInfo);
+    }
+
+    /**
+     * Ocultar panel de descarga
+     */
+    hideDownloadPanel() {
+        if (this.elements.downloadContainer) {
+            this.elements.downloadContainer.style.display = 'none';
+        }
+    }
+
+    /**
+     * Actualizar información del panel de descarga
+     */
+    updateDownloadInfo(downloadInfo) {
+        if (downloadInfo) {
+            // Actualizar número de registros
+            if (this.elements.downloadRecords) {
+                this.elements.downloadRecords.textContent = downloadInfo.totalRecords.toLocaleString();
+            }
+
+            // Actualizar rango de fechas
+            if (this.elements.downloadDateRange) {
+                this.elements.downloadDateRange.textContent = `${downloadInfo.startDate} - ${downloadInfo.endDate}`;
+            }
+        }
+    }
+
+    /**
      * Mostrar estadísticas finales
      */
     showFinalStats(stats) {
@@ -270,7 +443,26 @@ class DataView {
     clearForNewExtraction() {
         this.clearLogs();
         this.hideProgress();
+        this.hideDownloadPanel();
         this.showLoading('Iniciando extracción...');
+        this.logCount = 0;
+        this.updateLogCount();
+    }
+
+    /**
+     * Limpiar logs
+     */
+    clearLogs() {
+        if (this.elements.logs) {
+            this.elements.logs.innerHTML = `
+                <div class="no-logs-message">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Los mensajes de actividad aparecerán aquí</p>
+                </div>
+            `;
+        }
+        this.logCount = 0;
+        this.updateLogCount();
     }
 
     /**
@@ -279,6 +471,7 @@ class DataView {
     setCallbacks(callbacks) {
         this.onExtract = callbacks.onExtract;
         this.onClearCache = callbacks.onClearCache;
+        this.onDownload = callbacks.onDownload;
     }
 
     /**
@@ -293,6 +486,20 @@ class DataView {
         const clearCacheBtn = document.querySelector('.btn-secondary');
         if (clearCacheBtn && this.eventListeners.clearCacheBtn) {
             clearCacheBtn.removeEventListener('click', this.eventListeners.clearCacheBtn);
+        }
+
+        // Remover event listeners de botones preset
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(button => {
+            const listenerKey = `preset-${button.dataset.days}`;
+            if (this.eventListeners[listenerKey]) {
+                button.removeEventListener('click', this.eventListeners[listenerKey]);
+            }
+        });
+
+        // Remover event listener del botón de descarga
+        if (this.elements.downloadBtn && this.eventListeners.downloadBtn) {
+            this.elements.downloadBtn.removeEventListener('click', this.eventListeners.downloadBtn);
         }
 
         this.eventListeners = {};
