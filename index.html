@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor de Precios de Bolsa SIMEM</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Extractor de Precios de Bolsa</h1>
+        <p class="subtitle">SIMEM - Sistema de Intercambios del Mercado Eléctrico Mayorista</p>
+
+        <div class="info-section">
+            <h3>📊 Variables del Dataset</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <strong>PB_Nal</strong>
+                    <p>Precio de bolsa nacional</p>
+                </div>
+                <div class="info-card">
+                    <strong>PB_Int</strong>
+                    <p>Precio de bolsa internacional</p>
+                </div>
+                <div class="info-card">
+                    <strong>PB_Tie</strong>
+                    <p>Precio de bolsa TIE (Ecuador)</p>
+                </div>
+            </div>
+
+            <h3>📋 Columnas del CSV</h3>
+            <ul class="columns-list">
+                <li><strong>CodigoVariable:</strong> Código de la variable (PB_Nal, PB_Int, PB_Tie)</li>
+                <li><strong>FechaHora:</strong> Fecha y hora de representación del dato</li>
+                <li><strong>Valor:</strong> Valor de la variable en COP/kWh</li>
+                <li><strong>UnidadMedida:</strong> Unidad de medida (COP/kWh)</li>
+                <li><strong>Version:</strong> Versión de la liquidación (TX1, TX2, TX3, TXR, TXF)</li>
+                <li><strong>CodigoDuracion:</strong> Código de duración en formato ISO8601 (PT1H = 1 hora)</li>
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label for="fechaInicial">Fecha Inicial:</label>
+            <input type="date" id="fechaInicial" value="2025-01-01">
+        </div>
+
+        <div class="form-group">
+            <label for="fechaFinal">Fecha Final:</label>
+            <input type="date" id="fechaFinal" value="2025-01-31">
+        </div>
+
+        <button class="btn" id="extractBtn">
+            🚀 Extraer Datos
+        </button>
+
+        <div class="cache-controls">
+            <div class="cache-stats" id="cacheStats">
+                <strong>📊 Estadísticas de Caché:</strong><br>
+                Cargando...
+            </div>
+            <button class="btn-secondary" onclick="window.cacheLocal.limpiarCache()">
+                🗑️ Limpiar Caché
+            </button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+
+            <div class="status-message" id="statusMessage">
+                <p><span class="spinner"></span>Iniciando extracción...</p>
+            </div>
+
+            <div class="logs" id="logs"></div>
+        </div>
+
+        <div class="footer">
+            <p>🛠️ Creado por: <strong>Aldemar Mejía</strong></p>
+            <p>📧 Contacto: <a href="mailto:mejia414@hotmail.com">mejia414@hotmail.com</a></p>
+        </div>
+    </div>
+
+    <!-- Scripts de la arquitectura MVC -->
+    <script src="src/js/core/cache.js"></script>
+    <script src="src/js/mvc/models/DataModel.js"></script>
+    <script src="src/js/mvc/views/DataView.js"></script>
+    <script src="src/js/mvc/controllers/DataController.js"></script>
+</body>
+</html>
