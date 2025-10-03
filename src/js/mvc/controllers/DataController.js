@@ -107,11 +107,15 @@ class DataController {
                     // Mostrar panel de descarga con los datos disponibles
                     this.view.showDownloadPanel(this.lastExtractionInfo);
 
+                    // Mostrar datos en gráficos
+                    this.view.showData(result.data);
+
                     const csvContent = this.model.convertToCSV(result.data);
                     const filename = `precios_bolsa_${this.model.formatDate(new Date(startDate))}_${this.model.formatDate(new Date(endDate))}.csv`;
                     this.model.downloadCSV(csvContent, filename);
 
                     this.view.addLog(`📥 Archivo CSV descargado: ${filename}`, "success");
+                    this.view.addLog(`📊 ${result.data.length} registros listos para visualizar en gráficos`, "success");
                     this.view.showExtractionComplete(result.stats);
                 } else {
                     this.view.showWarning("No se obtuvieron datos para descargar");

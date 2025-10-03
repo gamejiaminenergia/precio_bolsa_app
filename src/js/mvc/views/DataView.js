@@ -9,27 +9,45 @@
 class DataView {
     constructor() {
         this.elements = {
-            fechaInicial: document.getElementById('fechaInicial'),
-            fechaFinal: document.getElementById('fechaFinal'),
-            extractBtn: document.getElementById('extractBtn'),
-            progressContainer: document.getElementById('progressContainer'),
-            progressBar: document.getElementById('progressBar'),
-            statusMessage: document.getElementById('statusMessage'),
-            logs: document.getElementById('logs'),
-            cacheDates: document.getElementById('cacheDates'),
-            cacheRecords: document.getElementById('cacheRecords'),
-            cacheSize: document.getElementById('cacheSize'),
-            lastUpdate: document.getElementById('lastUpdate'),
-            logCount: document.getElementById('logCount'),
-            downloadContainer: document.getElementById('downloadContainer'),
-            downloadBtn: document.getElementById('downloadBtn'),
-            downloadRecords: document.getElementById('downloadRecords'),
-            downloadDateRange: document.getElementById('downloadDateRange')
-        };
+             fechaInicial: document.getElementById('fechaInicial'),
+             fechaFinal: document.getElementById('fechaFinal'),
+             extractBtn: document.getElementById('extractBtn'),
+             progressContainer: document.getElementById('progressContainer'),
+             progressBar: document.getElementById('progressBar'),
+             statusMessage: document.getElementById('statusMessage'),
+             logs: document.getElementById('logs'),
+             cacheDates: document.getElementById('cacheDates'),
+             cacheRecords: document.getElementById('cacheRecords'),
+             cacheSize: document.getElementById('cacheSize'),
+             lastUpdate: document.getElementById('lastUpdate'),
+             logCount: document.getElementById('logCount'),
+             downloadContainer: document.getElementById('downloadContainer'),
+             downloadBtn: document.getElementById('downloadBtn'),
+             downloadRecords: document.getElementById('downloadRecords'),
+             downloadDateRange: document.getElementById('downloadDateRange'),
+             // Elementos de gráficos
+             visualizationContainer: document.getElementById('visualizationContainer'),
+             chartDiv: document.getElementById('chart_div'),
+             chartTypeLine: document.getElementById('chartTypeLine'),
+             chartTypeBar: document.getElementById('chartTypeBar'),
+             chartTypeColumn: document.getElementById('chartTypeColumn'),
+             viewModeChart: document.getElementById('viewModeChart'),
+             refreshChart: document.getElementById('refreshChart'),
+             exportChart: document.getElementById('exportChart'),
+             chartDataPoints: document.getElementById('chartDataPoints'),
+             chartDateRange: document.getElementById('chartDateRange')
+         };
 
         this.eventListeners = {};
         this.logCount = 0;
         this.lastUpdateTime = null;
+
+        // Propiedades para gráficos
+        this.chartData = [];
+        this.currentChartType = 'line';
+        this.currentViewMode = 'chart';
+        this.chart = null;
+        this.googleChartsLoaded = false;
     }
 
     /**
@@ -37,6 +55,8 @@ class DataView {
      */
     initialize() {
         this.setupEventListeners();
+        this.setupChartEventListeners();
+        this.initializeGoogleCharts();
         this.updateCacheStats();
     }
 
@@ -84,6 +104,83 @@ class DataView {
             this.elements.downloadBtn.addEventListener('click', this.eventListeners.downloadBtn);
         }
     }
+
+
+    /**
+     * Configurar event listeners específicos de gráficos
+     */
+    setupChartEventListeners() {
+        // Event listeners para cambio de tipo de gráfico
+        if (this.elements.chartTypeLine) {
+            this.eventListeners.chartTypeLine = () => {
+                this.currentChartType = 'line';
+                this.updateChart();
+            };
+            this.elements.chartTypeLine.addEventListener('change', this.eventListeners.chartTypeLine);
+        }
+
+        if (this.elements.chartTypeBar) {
+            this.eventListeners.chartTypeBar = () => {
+                this.currentChartType = 'bar';
+                this.updateChart();
+            };
+            this.elements.chartTypeBar.addEventListener('change', this.eventListeners.chartTypeBar);
+        }
+
+        if (this.elements.chartTypeColumn) {
+            this.eventListeners.chartTypeColumn = () => {
+                this.currentChartType = 'column';
+                this.updateChart();
+            };
+            this.elements.chartTypeColumn.addEventListener('change', this.eventListeners.chartTypeColumn);
+        }
+
+        // Event listeners para cambio de modo de vista
+        if (this.elements.viewModeChart) {
+            this.eventListeners.viewModeChart = () => {
+                this.currentViewMode = 'chart';
+                this.showChartView();
+            };
+            this.elements.viewModeChart.addEventListener('change', this.eventListeners.viewModeChart);
+        }
+
+        // Event listener para actualizar gráfico
+        if (this.elements.refreshChart) {
+            this.eventListeners.refreshChart = () => {
+                this.refreshChart();
+            };
+            this.elements.refreshChart.addEventListener('click', this.eventListeners.refreshChart);
+        }
+
+        // Event listener para exportar gráfico
+        if (this.elements.exportChart) {
+            this.eventListeners.exportChart = () => {
+                this.exportChartImage();
+            };
+            this.elements.exportChart.addEventListener('click', this.eventListeners.exportChart);
+        }
+    }
+
+    /**
+     * Inicializar Google Charts
+     */
+    initializeGoogleCharts() {
+        if (typeof google === 'undefined') {
+            this.addLog('❌ Error: Google Charts no está disponible', 'error');
+            return;
+        }
+
+        google.charts.load('current', {
+            'packages': ['corechart', 'line', 'bar'],
+            'language': 'es'
+        });
+
+        google.charts.setOnLoadCallback(() => {
+            this.googleChartsLoaded = true;
+            this.addLog('✅ Google Charts inicializado correctamente', 'success');
+        });
+    }
+
 
     /**
      * Establecer fechas preset
@@ -271,6 +368,348 @@ class DataView {
     }
 
     /**
+     * Mostrar datos (gráficos)
+     */
+    showData(data) {
+        this.chartData = data || [];
+
+        // Mostrar contenedor de visualización
+        if (this.elements.visualizationContainer) {
+            this.elements.visualizationContainer.style.display = 'block';
+        }
+
+        this.updateChart();
+        this.updateChartInfo();
+    }
+
+
+    /**
+     * Ocultar visualización
+     */
+    hideVisualization() {
+        if (this.elements.visualizationContainer) {
+            this.elements.visualizationContainer.style.display = 'none';
+        }
+    }
+
+
+    /**
+     * Actualizar gráfico
+     */
+    updateChart() {
+        if (!this.googleChartsLoaded || !this.chartData || this.chartData.length === 0) {
+            this.showEmptyChart();
+            return;
+        }
+
+        if (!this.elements.chartDiv) return;
+
+        try {
+            const data = this.prepareChartData();
+            const options = this.getChartOptions();
+
+            switch (this.currentChartType) {
+                case 'line':
+                    this.chart = new google.visualization.LineChart(this.elements.chartDiv);
+                    break;
+                case 'bar':
+                    this.chart = new google.visualization.BarChart(this.elements.chartDiv);
+                    break;
+                case 'column':
+                    this.chart = new google.visualization.ColumnChart(this.elements.chartDiv);
+                    break;
+                default:
+                    this.chart = new google.visualization.LineChart(this.elements.chartDiv);
+            }
+
+            this.chart.draw(data, options);
+        } catch (error) {
+            this.addLog(`❌ Error al actualizar gráfico: ${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * Preparar datos para el gráfico
+     */
+    prepareChartData() {
+        const data = new google.visualization.DataTable();
+
+        // Agregar columnas
+        data.addColumn('datetime', 'Fecha y Hora');
+        data.addColumn('number', 'Precio Nacional (PB_Nal)');
+        data.addColumn('number', 'Precio Internacional (PB_Int)');
+        data.addColumn('number', 'Precio TIE (PB_Tie)');
+
+        // Preparar datos agrupados por fecha
+        const groupedData = {};
+
+        this.chartData.forEach(row => {
+            const date = new Date(row.FechaHora);
+            const dateKey = date.toISOString().split('T')[0];
+
+            if (!groupedData[dateKey]) {
+                groupedData[dateKey] = {
+                    date: date,
+                    PB_Nal: null,
+                    PB_Int: null,
+                    PB_Tie: null
+                };
+            }
+
+            if (row.CodigoVariable === 'PB_Nal') {
+                groupedData[dateKey].PB_Nal = parseFloat(row.Valor) || 0;
+            } else if (row.CodigoVariable === 'PB_Int') {
+                groupedData[dateKey].PB_Int = parseFloat(row.Valor) || 0;
+            } else if (row.CodigoVariable === 'PB_Tie') {
+                groupedData[dateKey].PB_Tie = parseFloat(row.Valor) || 0;
+            }
+        });
+
+        // Convertir a array y ordenar por fecha
+        const chartRows = Object.values(groupedData)
+            .filter(row => row.PB_Nal !== null || row.PB_Int !== null || row.PB_Tie !== null)
+            .sort((a, b) => a.date - b.date)
+            .slice(-100); // Limitar a últimos 100 puntos para mejor rendimiento
+
+        chartRows.forEach(row => {
+            data.addRow([
+                row.date,
+                row.PB_Nal,
+                row.PB_Int,
+                row.PB_Tie
+            ]);
+        });
+
+        return data;
+    }
+
+    /**
+     * Obtener opciones del gráfico
+     */
+    getChartOptions() {
+        const baseOptions = {
+            title: 'Precios de Bolsa Eléctrica',
+            titleTextStyle: {
+                fontSize: 18,
+                bold: true,
+                color: '#495057'
+            },
+            backgroundColor: 'transparent',
+            legend: {
+                position: 'top',
+                textStyle: {
+                    color: '#6c757d'
+                }
+            },
+            colors: ['#007bff', '#28a745', '#ffc107'],
+            hAxis: {
+                title: 'Fecha y Hora',
+                titleTextStyle: {
+                    color: '#6c757d'
+                },
+                textStyle: {
+                    color: '#6c757d'
+                },
+                format: 'dd/MM/yy'
+            },
+            vAxis: {
+                title: 'Precio (COP/kWh)',
+                titleTextStyle: {
+                    color: '#6c757d'
+                },
+                textStyle: {
+                    color: '#6c757d'
+                },
+                format: 'decimal'
+            },
+            chartArea: {
+                backgroundColor: 'transparent',
+                width: '80%',
+                height: '70%'
+            },
+            height: 500,
+            width: '100%'
+        };
+
+        // Opciones específicas por tipo de gráfico
+        switch (this.currentChartType) {
+            case 'line':
+                return {
+                    ...baseOptions,
+                    curveType: 'function',
+                    lineWidth: 3,
+                    pointSize: 4
+                };
+            case 'bar':
+                return {
+                    ...baseOptions,
+                    bar: {
+                        groupWidth: '75%'
+                    }
+                };
+            case 'column':
+                return {
+                    ...baseOptions,
+                    bar: {
+                        groupWidth: '75%'
+                    }
+                };
+            default:
+                return baseOptions;
+        }
+    }
+
+    /**
+     * Mostrar gráfico vacío
+     */
+    showEmptyChart() {
+        if (!this.elements.chartDiv) return;
+
+        this.elements.chartDiv.innerHTML = `
+            <div class="empty-chart-message">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No hay datos para mostrar en el gráfico</p>
+                <small class="text-muted">Realice una extracción de datos para ver el gráfico</small>
+            </div>
+        `;
+    }
+
+    /**
+     * Actualizar información del gráfico
+     */
+    updateChartInfo() {
+        if (this.elements.chartDataPoints) {
+            this.elements.chartDataPoints.textContent = this.chartData.length.toLocaleString();
+        }
+
+        if (this.elements.chartDateRange && this.chartData.length > 0) {
+            const dates = this.chartData.map(row => new Date(row.FechaHora));
+            const minDate = new Date(Math.min(...dates));
+            const maxDate = new Date(Math.max(...dates));
+
+            const formatDate = (date) => {
+                return date.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            };
+
+            this.elements.chartDateRange.textContent = `${formatDate(minDate)} - ${formatDate(maxDate)}`;
+        }
+    }
+
+    /**
+     * Mostrar vista de gráfico
+     */
+    showChartView() {
+        if (this.elements.tableContainer) {
+            this.elements.tableContainer.style.display = 'none';
+        }
+        if (this.elements.visualizationContainer) {
+            this.elements.visualizationContainer.style.display = 'block';
+        }
+        this.updateChart();
+    }
+
+
+    /**
+     * Refrescar gráfico
+     */
+    refreshChart() {
+        this.updateChart();
+        this.updateChartInfo();
+        this.addLog('📊 Gráfico actualizado', 'info');
+    }
+
+    /**
+     * Exportar imagen del gráfico
+     */
+    exportChartImage() {
+        if (!this.chart) {
+            this.showWarning('No hay gráfico para exportar');
+            return;
+        }
+
+        try {
+            const chartContainer = this.elements.chartDiv;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Configurar canvas con el tamaño del gráfico
+            canvas.width = chartContainer.offsetWidth;
+            canvas.height = chartContainer.offsetHeight;
+
+            // Crear imagen base64 del gráfico
+            const imgData = this.chart.getImageURI();
+
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+
+                // Crear enlace de descarga
+                const link = document.createElement('a');
+                link.download = `grafico_precios_${new Date().toISOString().slice(0, 10)}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+            img.src = imgData;
+
+            this.addLog('📷 Gráfico exportado correctamente', 'success');
+        } catch (error) {
+            this.showError('Error al exportar gráfico');
+            this.addLog(`❌ Error en exportación de gráfico: ${error.message}`, 'error');
+        }
+    }
+
+
+
+
+
+    /**
+     * Formatear código de variable
+     */
+    formatVariableCode(code) {
+        const codes = {
+            'PB_Nal': 'Nacional',
+            'PB_Int': 'Internacional',
+            'PB_Tie': 'TIE'
+        };
+        return codes[code] || code;
+    }
+
+    /**
+     * Formatear fecha y hora
+     */
+    formatDateTime(dateTime) {
+        try {
+            const date = new Date(dateTime);
+            return date.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        } catch (error) {
+            return dateTime;
+        }
+    }
+
+    /**
+     * Formatear número
+     */
+    formatNumber(value) {
+        const num = parseFloat(value);
+        if (isNaN(num)) return value;
+        return num.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    /**
      * Limpiar logs
      */
     clearLogs() {
@@ -444,9 +883,16 @@ class DataView {
         this.clearLogs();
         this.hideProgress();
         this.hideDownloadPanel();
+        this.hideVisualization();
+        this.showEmptyChart();
         this.showLoading('Iniciando extracción...');
         this.logCount = 0;
         this.updateLogCount();
+
+        // Limpiar datos de gráficos
+        this.chartData = [];
+        this.currentChartType = 'line';
+        this.currentViewMode = 'chart';
     }
 
     /**
@@ -501,6 +947,7 @@ class DataView {
         if (this.elements.downloadBtn && this.eventListeners.downloadBtn) {
             this.elements.downloadBtn.removeEventListener('click', this.eventListeners.downloadBtn);
         }
+
 
         this.eventListeners = {};
     }

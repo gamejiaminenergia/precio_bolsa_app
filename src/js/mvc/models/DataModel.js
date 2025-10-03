@@ -304,6 +304,139 @@ class DataModel {
     }
 
     /**
+     * Formatear número para visualización en tabla
+     */
+    formatNumberForTable(value) {
+        const num = parseFloat(value);
+        if (isNaN(num)) return value;
+        return num.toLocaleString('es-ES', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    /**
+     * Formatear fecha y hora para visualización en tabla
+     */
+    formatDateTimeForTable(dateTime) {
+        try {
+            const date = new Date(dateTime);
+            return date.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        } catch (error) {
+            return dateTime;
+        }
+    }
+
+    /**
+     * Obtener nombre legible de código de variable
+     */
+    getVariableDisplayName(code) {
+        const codes = {
+            'PB_Nal': 'Precio Bolsa Nacional',
+            'PB_Int': 'Precio Bolsa Internacional',
+            'PB_Tie': 'Precio Bolsa TIE (Ecuador)'
+        };
+        return codes[code] || code;
+    }
+
+    /**
+     * Filtrar datos por término de búsqueda
+     */
+    filterDataBySearchTerm(data, searchTerm) {
+        if (!searchTerm) return data;
+
+        const searchLower = searchTerm.toLowerCase();
+        return data.filter(row => {
+            return Object.values(row).some(value =>
+                String(value).toLowerCase().includes(searchLower)
+            );
+        });
+    }
+
+    /**
+     * Ordenar datos por columna
+     */
+    sortDataByColumn(data, column, direction = 'asc') {
+        return data.sort((a, b) => {
+            const aValue = a[column];
+            const bValue = b[column];
+
+            // Manejar valores numéricos
+            if (column === 'Valor') {
+                const aNum = parseFloat(aValue) || 0;
+                const bNum = parseFloat(bValue) || 0;
+                return direction === 'asc' ? aNum - bNum : bNum - aNum;
+            }
+
+            // Manejar fechas
+            if (column === 'FechaHora') {
+                const aDate = new Date(aValue);
+                const bDate = new Date(bValue);
+                return direction === 'asc' ? aDate - bDate : bDate - aDate;
+            }
+
+            // Manejar texto
+            const aStr = String(aValue).toLowerCase();
+            const bStr = String(bValue).toLowerCase();
+
+            if (direction === 'asc') {
+                return aStr.localeCompare(bStr);
+            } else {
+                return bStr.localeCompare(aStr);
+            }
+        });
+    }
+
+    /**
+     * Obtener estadísticas de datos para tabla
+     */
+    getTableStats(data) {
+        if (!data || data.length === 0) {
+            return {
+                totalRecords: 0,
+                dateRange: null,
+                variables: [],
+                avgValue: 0,
+                minValue: 0,
+                maxValue: 0
+            };
+        }
+
+        const totalRecords = data.length;
+        const dates = data.map(row => new Date(row.FechaHora)).sort((a, b) => a - b);
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+
+        const variables = [...new Set(data.map(row => row.CodigoVariable))];
+
+        const values = data.map(row => parseFloat(row.Valor)).filter(val => !isNaN(val));
+        const avgValue = values.reduce((sum, val) => sum + val, 0) / values.length || 0;
+        const minValue = Math.min(...values) || 0;
+        const maxValue = Math.max(...values) || 0;
+
+        return {
+            totalRecords,
+            dateRange: {
+                start: firstDate.toISOString(),
+                end: lastDate.toISOString(),
+                startFormatted: this.formatDateTimeForTable(firstDate),
+                endFormatted: this.formatDateTimeForTable(lastDate)
+            },
+            variables,
+            avgValue: this.formatNumberForTable(avgValue),
+            minValue: this.formatNumberForTable(minValue),
+            maxValue: this.formatNumberForTable(maxValue)
+        };
+    }
+
+    /**
      * Utilidad para dormir
      */
     async sleep(ms) {
