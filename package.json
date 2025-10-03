@@ -1,0 +1,35 @@
+{
+  "name": "precio-bolsa-app",
+  "version": "2.0.0",
+  "description": "Aplicación web para extracción de precios de bolsa eléctrica colombiana",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": [
+    "precio-bolsa",
+    "mercado-electrico",
+    "colombia",
+    "simem",
+    "datos"
+  ],
+  "author": "Aldemar Mejía <mejia414@hotmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usuario/precio-bolsa-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usuario/precio-bolsa-app/issues"
+  },
+  "homepage": "https://github.com/usuario/precio-bolsa-app#readme"
+}

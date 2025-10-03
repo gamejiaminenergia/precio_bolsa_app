@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: precio-bolsa-app
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    port: 3000
+    healthCheckPath: /
+    autoDeploy: true
+    disk:
+      name: precio-bolsa-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+
+# Configuración adicional para optimización
+build:
+  dockerfilePath: ./Dockerfile
+
+# Variables de entorno adicionales (opcionales)
+# Puedes agregar más variables según necesites
+environments:
+  - key: production
+    value:
+      NODE_ENV: production
+      PORT: 3000
+
+# Configuración de monitoreo básico
+monitors:
+  - type: http
+    path: /
+    method: GET
+    statusCode: 200
+    timeout: 10000
+    interval: 60
